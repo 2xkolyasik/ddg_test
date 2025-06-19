@@ -1,101 +1,93 @@
 ---
-    - name: Установка Docker и Docker Compose
-      apt:
-        update_cache: yes
-        name:
-          - docker.io
-          - docker-compose
-        state: present
+- name: Установка Docker и Docker Compose
+  ansible.builtin.apt:
+    update_cache: yes
+    name:
+      - docker.io
+      - docker-compose
+    state: present
 
-    - name: Запуск и включение службы Docker
-      service:
-        name: docker
-        state: started
-        enabled: yes
+- name: Запуск и включение службы Docker
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: yes
 
-    - name: Добавление пользователя в группу docker
-      user:
-        name: "{{ ansible_user }}"
-        groups: docker
-        append: yes
+- name: Добавление пользователя в группу docker
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes
 
-    - name: Создание директории /opt/monitoring
-      file:
-        path: /opt/monitoring
-        state: directory
-        mode: '0755'
+- name: Создание директории /opt/monitoring
+  ansible.builtin.file:
+    path: /opt/monitoring
+    state: directory
+    mode: '0755'
 
-    - name: Создание директории для дашбордов Grafana
-      file:
-        path: /opt/monitoring/grafana/dashboards
-        state: directory
-        owner: root
-        group: root
-        mode: '0755'
+- name: Создание директории для дашбордов Grafana
+  ansible.builtin.file:
+    path: /opt/monitoring/grafana/dashboards
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
 
-    - name: Копирование файлов дашбордов Grafana
-      copy:
-        src: "{{ item }}"
-        dest: /opt/monitoring/grafana/dashboards/
-        owner: root
-        group: root
-        mode: '0644'
-        loop:
-         - files/grafana/dashboards/mariadb_metrics.json
-         - files/grafana/dashboards/os_metrics.json
+- name: Копирование файлов дашбордов Grafana
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /opt/monitoring/grafana/dashboards/
+    owner: root
+    group: root
+    mode: '0644'
+  loop:
+    - files/grafana/dashboards/mariadb_metrics.json
+    - files/grafana/dashboards/os_metrics.json
 
-    - name: Копирование конфигурации Prometheus
-      copy:
-        src: files/prometheus/prometheus.yml
-        dest: /opt/monitoring/prometheus.yml
-        owner: root
-        group: root
-        mode: '0644'
+- name: Копирование конфигурации Prometheus
+  ansible.builtin.copy:
+    src: files/prometheus/prometheus.yml
+    dest: /opt/monitoring/prometheus.yml
+    owner: root
+    group: root
+    mode: '0644'
 
-    - name: Копирование конфигурации источника данных Grafana
-      copy:
-        src: files/grafana/datasources/
-        dest: /opt/monitoring/grafana/provisioning/datasources/
-        owner: root
-        group: root
-        mode: '0644'
+- name: Копирование конфигурации источника данных Grafana
+  ansible.builtin.copy:
+    src: files/grafana/datasources/
+    dest: /opt/monitoring/grafana/provisioning/datasources/
+    owner: root
+    group: root
+    mode: '0644'
+    directory_mode: '0755'
 
-    - name: Копирование конфигурации дашбордов Grafana
-      copy:
-        src: files/grafana/dashboard.yml
-        dest: /opt/monitoring/grafana/dashboard.yml
-        owner: root
-        group: root
-        mode: '0644'
+- name: Копирование конфигурации дашбордов Grafana
+  ansible.builtin.copy:
+    src: files/grafana/dashboard.yml
+    dest: /opt/monitoring/grafana/dashboard.yml
+    owner: root
+    group: root
+    mode: '0644'
 
-    - name: Копирование файлов дашбордов Grafana
-      copy:
-        src: files/grafana/dashboards/
-        dest: /opt/monitoring/grafana/dashboards/
-        owner: root
-        group: root
-        mode: '0644'
-        recurse: yes
+- name: Копирование файла docker-compose.yml
+  ansible.builtin.copy:
+    src: files/docker-compose.yml
+    dest: /opt/monitoring/docker-compose.yml
+    owner: root
+    group: root
+    mode: '0644'
 
-    - name: Копирование файла docker-compose.yml
-      copy:
-        src: files/docker-compose.yml
-        dest: /opt/monitoring/docker-compose.yml
-        owner: root
-        group: root
-        mode: '0644'
+- name: Проверка наличия Docker socket
+  ansible.builtin.stat:
+    path: /var/run/docker.sock
+  register: docker_socket
 
-    - name: Проверка наличия Docker socket
-      stat:
-        path: /var/run/docker.sock
-      register: docker_socket
+- name: Аварийное завершение при недоступности Docker
+  ansible.builtin.fail:
+    msg: "Docker не запущен (не найден /var/run/docker.sock)!"
+  when: not docker_socket.stat.exists
 
-    - name: Аварийное завершение при недоступности Docker
-      fail:
-        msg: "Docker не запущен (не найден /var/run/docker.sock)!"
-      when: not docker_socket.stat.exists
-
-    - name: Запуск мониторингового стека через Docker Compose
-      command: docker-compose up -d
-      args:
-        chdir: /opt/monitoring
+- name: Запуск мониторингового стека через Docker Compose
+  ansible.builtin.command:
+    cmd: docker-compose up -d
+    chdir: /opt/monitoring
