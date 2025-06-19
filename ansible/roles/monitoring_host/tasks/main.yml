@@ -25,15 +25,24 @@
         state: directory
         mode: '0755'
 
-    - name: Создание директорий для Grafana
+    - name: Создание директории для дашбордов Grafana
       file:
-        path: "/opt/monitoring/{{ item }}"
+        path: /opt/monitoring/grafana/dashboards
         state: directory
+        owner: root
+        group: root
         mode: '0755'
-      loop:
-        - grafana/provisioning/datasources
-        - grafana/provisioning/dashboards
-        - grafana/dashboards
+
+    - name: Копирование файлов дашбордов Grafana
+      copy:
+        src: "{{ item }}"
+        dest: /opt/monitoring/grafana/dashboards/
+        owner: root
+        group: root
+        mode: '0644'
+        loop:
+         - files/grafana/dashboards/mariadb_metrics.json
+         - files/grafana/dashboards/os_metrics.json
 
     - name: Копирование конфигурации Prometheus
       copy:
