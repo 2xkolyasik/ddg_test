@@ -1,0 +1,10 @@
+---
+- name: Установка python3 на чистых системах
+  hosts: all
+  gather_facts: false
+  become: yes
+
+  tasks:
+    - name: Установка python3 через raw
+      raw: |
+        apt update -y && apt install -y python3

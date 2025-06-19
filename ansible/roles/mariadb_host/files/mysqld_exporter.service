@@ -1,0 +1,12 @@
+[Unit]
+Description=MySQL Exporter
+After=network.target
+
+[Service]
+User=mysqld_exporter
+ExecStart=/usr/local/bin/mysqld_exporter
+Environment="DATA_SOURCE_NAME=exporter:StrongPassword123!@(127.0.0.1:3306)/"
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

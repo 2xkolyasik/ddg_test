@@ -1,0 +1,13 @@
+---
+
+- name: Настройка mariadb-хоста
+  hosts: mariadb_host
+  become: true
+  roles:
+    - mariadb_host
+
+- name: Настройка monitoring-хоста
+  hosts: monitoring_host
+  become: true
+  roles:
+    - monitoring_host
