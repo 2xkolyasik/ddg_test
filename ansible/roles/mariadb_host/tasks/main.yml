@@ -1,6 +1,6 @@
 ---
 - name: Установка MariaDB и необходимых пакетов
-  apt:
+  ansible.builtin.apt:
     update_cache: yes
     name:
       - curl
@@ -12,23 +12,23 @@
     state: present
 
 - name: Запуск и включение службы MariaDB
-  service:
+  ansible.builtin.service:
     name: mariadb
     state: started
     enabled: yes
 
-- name: Создание пользователя exporter@127.0.0.1 в MySQL
-  mysql_user:
+- name: Создание пользователя exporter@127.0.0.1
+  community.mysql.mysql_user:
     name: exporter
     host: "127.0.0.1"
     password: "{{ mysqld_exporter_password }}"
-    priv: '*.*:PROCESS, REPLICATION CLIENT, SELECT'
+    priv: '*.*:PROCESS,REPLICATION CLIENT,SELECT'
     state: present
     login_user: root
     login_unix_socket: /var/run/mysqld/mysqld.sock
 
 - name: Копирование конфигурации .my.cnf для пользователя exporter
-  copy:
+  ansible.builtin.copy:
     dest: /etc/.my.cnf
     owner: mysqld_exporter
     group: mysqld_exporter
@@ -40,41 +40,41 @@
       host=127.0.0.1
 
 - name: Загрузка Node Exporter
-  get_url:
+  ansible.builtin.get_url:
     url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz"
     dest: /tmp/node_exporter.tar.gz
     mode: '0644'
 
 - name: Распаковка архива Node Exporter
-  unarchive:
+  ansible.builtin.unarchive:
     src: /tmp/node_exporter.tar.gz
     dest: /opt
     remote_src: yes
 
 - name: Установка бинарного файла Node Exporter
-  command: mv "/opt/node_exporter-{{ node_exporter_version }}.linux-amd64/node_exporter" /usr/local/bin/node_exporter
-  args:
+  ansible.builtin.command:
+    cmd: mv "/opt/node_exporter-{{ node_exporter_version }}.linux-amd64/node_exporter" /usr/local/bin/node_exporter
     creates: /usr/local/bin/node_exporter
 
 - name: Загрузка MySQLd Exporter
-  get_url:
+  ansible.builtin.get_url:
     url: "https://github.com/prometheus/mysqld_exporter/releases/download/v{{ mysqld_exporter_version }}/mysqld_exporter-{{ mysqld_exporter_version }}.linux-amd64.tar.gz"
     dest: /tmp/mysqld_exporter.tar.gz
     mode: '0644'
 
 - name: Распаковка архива MySQLd Exporter
-  unarchive:
+  ansible.builtin.unarchive:
     src: /tmp/mysqld_exporter.tar.gz
     dest: /opt
     remote_src: yes
 
 - name: Установка бинарного файла mysqld_exporter
-  command: mv /opt/mysqld_exporter-{{ mysqld_exporter_version }}.linux-amd64/mysqld_exporter /usr/local/bin/mysqld_exporter
-  args:
+  ansible.builtin.command:
+    cmd: mv "/opt/mysqld_exporter-{{ mysqld_exporter_version }}.linux-amd64/mysqld_exporter" /usr/local/bin/mysqld_exporter
     creates: /usr/local/bin/mysqld_exporter
 
 - name: Создание systemd-сервиса для Node Exporter
-  copy:
+  ansible.builtin.copy:
     dest: /etc/systemd/system/node_exporter.service
     owner: root
     group: root
@@ -94,7 +94,7 @@
       WantedBy=multi-user.target
 
 - name: Создание systemd-сервиса для MySQLd Exporter
-  copy:
+  ansible.builtin.copy:
     dest: /etc/systemd/system/mysqld_exporter.service
     owner: root
     group: root
@@ -114,16 +114,17 @@
       WantedBy=multi-user.target
 
 - name: Перезагрузка конфигурации systemd
-  command: systemctl daemon-reload
+  ansible.builtin.command:
+    cmd: systemctl daemon-reload
 
 - name: Включение и запуск Node Exporter
-  systemd:
+  ansible.builtin.systemd:
     name: node_exporter
     enabled: yes
     state: started
 
 - name: Включение и запуск MySQLd Exporter
-  systemd:
+  ansible.builtin.systemd:
     name: mysqld_exporter
     enabled: yes
     state: started

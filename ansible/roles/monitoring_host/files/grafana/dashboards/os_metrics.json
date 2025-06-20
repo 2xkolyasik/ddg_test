@@ -43,7 +43,8 @@
       "targets": [
         {
           "expr": "rate(node_cpu_seconds_total{mode!=\"idle\"}[1m])",
-          "refId": "A"
+          "refId": "A",
+          "legendFormat": "CPU Usage"
         }
       ]
     },
@@ -80,7 +81,8 @@
       "targets": [
         {
           "expr": "node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes",
-          "refId": "A"
+          "refId": "A",
+          "legendFormat": "Memory Used"
         }
       ]
     },
@@ -117,7 +119,8 @@
       "targets": [
         {
           "expr": "node_filesystem_size_bytes - node_filesystem_free_bytes",
-          "refId": "A"
+          "refId": "A",
+          "legendFormat": "Disk Used"
         }
       ]
     },
@@ -154,7 +157,8 @@
       "targets": [
         {
           "expr": "rate(node_network_receive_bytes_total[1m])",
-          "refId": "A"
+          "refId": "A",
+          "legendFormat": "Network Receive"
         }
       ]
     },
@@ -191,7 +195,8 @@
       "targets": [
         {
           "expr": "rate(node_network_transmit_bytes_total[1m])",
-          "refId": "A"
+          "refId": "A",
+          "legendFormat": "Network Transmit"
         }
       ]
     }

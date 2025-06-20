@@ -43,7 +43,8 @@
       "targets": [
         {
           "expr": "mysql_global_status_threads_connected",
-          "refId": "A"
+          "refId": "A",
+          "legendFormat": "Active Connections"
         }
       ]
     },
@@ -80,7 +81,8 @@
       "targets": [
         {
           "expr": "rate(mysql_global_status_questions[1m])",
-          "refId": "A"
+          "refId": "A",
+          "legendFormat": "Queries per Second"
         }
       ]
     },
@@ -117,7 +119,8 @@
       "targets": [
         {
           "expr": "rate(mysql_global_status_com_select[1m])",
-          "refId": "A"
+          "refId": "A",
+          "legendFormat": "SELECT Queries per Second"
         }
       ]
     },
