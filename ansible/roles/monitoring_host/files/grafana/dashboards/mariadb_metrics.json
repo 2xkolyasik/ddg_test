@@ -44,7 +44,7 @@
         {
           "expr": "mysql_global_status_threads_connected",
           "refId": "A",
-          "legendFormat": "Active Connections"
+          "legendFormat": "{{instance}} - Active Connections"
         }
       ]
     },
@@ -82,7 +82,7 @@
         {
           "expr": "rate(mysql_global_status_questions[1m])",
           "refId": "A",
-          "legendFormat": "Queries per Second"
+          "legendFormat": "{{instance}} - Queries per Second"
         }
       ]
     },
@@ -120,7 +120,7 @@
         {
           "expr": "rate(mysql_global_status_com_select[1m])",
           "refId": "A",
-          "legendFormat": "SELECT Queries per Second"
+          "legendFormat": "{{instance}} - SELECT Queries per Second"
         }
       ]
     },
@@ -158,17 +158,17 @@
         {
           "expr": "rate(mysql_global_status_com_insert[1m])",
           "refId": "A",
-          "legendFormat": "INSERT"
+          "legendFormat": "{{instance}} - INSERT"
         },
         {
           "expr": "rate(mysql_global_status_com_update[1m])",
           "refId": "B",
-          "legendFormat": "UPDATE"
+          "legendFormat": "{{instance}} - UPDATE"
         },
         {
           "expr": "rate(mysql_global_status_com_delete[1m])",
           "refId": "C",
-          "legendFormat": "DELETE"
+          "legendFormat": "{{instance}} - DELETE"
         }
       ]
     }

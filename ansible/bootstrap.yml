@@ -1,10 +1,18 @@
 ---
-- name: Установка python3 на чистых системах
+- name: Установка Python3 на чистых системах
   hosts: all
   gather_facts: false
   become: yes
 
   tasks:
-    - name: Установка python3 через raw
-      raw: |
-        apt update -y && apt install -y python3
+    - name: Установка Python3 через raw
+      ansible.builtin.raw:
+        cmd: |
+          apt update -y && apt install -y python3
+        executable: /bin/bash
+
+    - name: Копирование SSH-ключа для входа без пароля
+      ansible.builtin.authorized_key:
+        user: "{{ ansible_user | default('kls') }}"
+        state: present
+        key: "{{ lookup('ansible.builtin.file', lookup('env', 'HOME') + '/.ssh/id_rsa.pub') }}"
